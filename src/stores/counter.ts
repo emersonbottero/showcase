@@ -16,13 +16,10 @@ interface Character {
 }
 
 export const useCounterStore = defineStore('counter', () => {
-  const count = ref(0)
   const apiCall = useFetch("https://rickandmortyapi.com/api/character", {immediate: false}).json<Data>()
-  const doubleCount = computed(() => count.value * 2)
+  const charId = ref()
+  const character = useFetch(computed(() => `https://rickandmortyapi.com/api/character/${charId.value}`),  { refetch: true }).json<Character>()
 
-  function increment() {
-    count.value++
-  }
 
-  return { count, doubleCount, increment, apiCall }
+  return { character, apiCall, charId }
 })

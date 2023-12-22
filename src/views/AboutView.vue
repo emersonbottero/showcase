@@ -2,6 +2,12 @@
   <div class="about">
     <div v-if="counterStore.apiCall.isFetching">Loading...</div>
     <div v-else class="container">
+      <div>
+        <input v-model="counterStore.charId" type="number" />
+        {{ counterStore.charId }}
+        <br />
+        <img :src="counterStore.character.data?.image" />
+      </div>
       <div v-for="character in counterStore.apiCall.data?.results" :key="character.image">
         <img :src="character.image" /> <br />
         <span>{{ character.name }}</span> - {{ character.gender }} <br />
@@ -34,6 +40,7 @@ onMounted(() => {
 .container {
   display: flex;
   flex-wrap: wrap;
+  gap: 0.25rem;
 }
 
 .container img {
