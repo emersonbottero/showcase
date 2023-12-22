@@ -1,6 +1,15 @@
 <template>
   <div class="about">
-    <div v-if="counterStore.apiCall.isFetching">Loading...</div>
+    all: {{ counterStore.mockCall?.data }}
+    <br />
+    <br />
+    <br />
+    <br />
+    <input v-model="counterStore.userId" type="number" />
+    user:
+    {{ counterStore.user.data }} <br />
+    <!-- comment  await makeServer() in main.ts to see below code working -->
+    <!-- <div v-if="counterStore.apiCall.isFetching">Loading...</div>
     <div v-else class="container">
       <div>
         <input v-model="counterStore.charId" type="number" />
@@ -13,7 +22,7 @@
         <span>{{ character.name }}</span> - {{ character.gender }} <br />
         <span> {{ character.species }}</span> - {{ character.status }} <br />
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -25,6 +34,7 @@ const counterStore = useCounterStore()
 
 onMounted(() => {
   counterStore.apiCall.execute()
+  counterStore.mockCall.execute()
 })
 </script>
 
