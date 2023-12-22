@@ -17,7 +17,7 @@ interface Character {
 
 export const useCounterStore = defineStore('counter', () => {
   const apiCall = useFetch("https://rickandmortyapi.com/api/character", {immediate: false}).json<Data>()
-  const charId = ref()
+  const charId = ref(1)
   const character = useFetch(computed(() => `https://rickandmortyapi.com/api/character/${charId.value}`),  { refetch: true }).json<Character>()
 
 
