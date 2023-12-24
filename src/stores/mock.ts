@@ -1,11 +1,13 @@
+import useApiFetch from '@/utils/useApiFetcher'
 import { defineStore } from 'pinia'
-import{ useFetch} from "@vueuse/core"
-import type { User } from '@/server'
+
+type User = {
+  name: string
+}
 
 export const useCounterStore = defineStore('counter', () => {  
-  
- const mockCall = useFetch("/api/users").json<User[]>()
- const userById = (id: number | undefined) =>  useFetch(`/api/users/${id}`).json<User>()
+  const mockCall = useApiFetch("/users").json<User[]>()
+  const userById = (id: number) =>  useApiFetch("/users/:id".toURL({id})).json<User>()
 
   return { mockCall, userById}
 })

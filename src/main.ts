@@ -8,9 +8,9 @@ import router from './router'
 
 import { makeServer } from "./server"
 
-// if (import.meta.env.DEV) {
-//    await makeServer()
-// }
+if (import.meta.env.DEV) {
+   await makeServer()
+}
 
 const app = createApp(App)
 
