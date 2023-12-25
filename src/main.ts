@@ -6,9 +6,9 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
-import { makeServer } from "./server"
 
 if (import.meta.env.DEV) {
+   const {makeServer} = await import("./server")
    await makeServer()
 }
 
