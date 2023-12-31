@@ -1,30 +1,46 @@
 import { createServer } from "miragejs"
 
+const isDynamic = (url: string) => url.includes(":") || url.includes("[")
+
 const moduleMocks = import.meta.glob("@/modules/**/*.json", {eager: true})
 const fixtures = {} as any
-const urls:string[] = []
+const requests:Function[] = []
+
 for (const path in moduleMocks) {
-  const url = path.split("mocks")[1].replace("/index.json","").replaceAll("[",":").replaceAll("]","")
+  const url = path.split("mocks")[1].replaceAll("[",":").replaceAll("]","") //.replace("/get.json","")
+  const cleanURL = url.replace("/get.json","").replace("/post.json","").replace("/patch.json","").replace("/put.json","")
+
   //@ts-ignore
   const mocks = moduleMocks[path].default
-  urls.push(url)
+
   if(Array.isArray(mocks)){
-    fixtures[url.replace("/","")] = mocks
+    fixtures[cleanURL.replace("/","")] = mocks
+  }
+
+  if(path.includes("get")){
+    if(isDynamic(path)){
+      requests.push((server: any) => server.get(cleanURL, (schema:any, request:any) => {
+        const id = request.params[cleanURL.split(":")[1]]
+        return schema.db[cleanURL.split("/")[1]].find(id)
+      }))
+    }
+    else{
+      requests.push((server:any) => server.get(cleanURL,(schema:any) => schema.db[cleanURL.replace("/","")].where((x:any) => x)))
+    }
+  }
+  else if(path.includes("post.json")){
+    requests.push((server:any) => server.post(cleanURL, () => mocks))
+  }
+  else if(path.includes("patch.json")){
+    requests.push((server:any) => server.patch(cleanURL, () => mocks))
+  }
+  else if(path.includes("put.json")){
+    requests.push((server:any) => server.put(cleanURL, () => mocks))
+  }
+  else if(path.includes("del.json")){
+    requests.push((server:any) => server.del(cleanURL, () => mocks))
   }
 }
-
-console.log(fixtures);
-console.log(urls);
-
-const routerFactory = (server: any, urls: string[]) => urls.map(url => 
-  !url.includes(":") ? 
-    server.get(url,(schema:any) => schema.db[url.replace("/","")].where((x:any) => x)) 
-  : server.get(url, (schema:any, request:any) => {
-    const id = request.params[url.split(":")[1]]
-    return schema.db[url.split("/")[1]].find(id)
-  })
-   )
-
 
 export async function makeServer() {
   const server = createServer({
@@ -33,16 +49,7 @@ export async function makeServer() {
 
     routes() {
       this.namespace = "api"
-
-      routerFactory(this, urls)
-
-      //Example of expected routes
-      // this.get("/users", (schema) => schema.db['users'].where((x:any) => x))
-
-      // this.get("/users/:id", (schema, request) => {
-      //   const id = request.params['id']
-      //   return schema.db['users'].find(id)
-      // })
+      requests.forEach(f => f(this))
     },
   })
 
