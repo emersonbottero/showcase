@@ -5,9 +5,10 @@ type User = {
   name: string
 }
 
-export const useCounterStore = defineStore('counter', () => {  
-  const mockCall = useApiFetch("/users").json<User[]>()
-  const userById = (id: number) =>  useApiFetch("/users/:id".toURL({id})).json<User>()
+export const useUserStore = defineStore('counter', () => {  
+  const GetUserApiCall = useApiFetch("/users").json<User[]>()
+  const userById = (id: number) => useApiFetch(`/users/${id}`).json<User>()
+  const userByAge =  (age: number) => useApiFetch(`/test?age=${age}`).json()
 
-  return { mockCall, userById}
+  return {  GetUserApiCall,userByAge, userById}
 })
